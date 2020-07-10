@@ -38,3 +38,17 @@ To download the dataset, use the Overpass API to download a custom square area. 
 https://overpass-api.de/api/map?bbox=-90.7189,38.7013,-90.3117,38.8884
 
 This project requires Python 2 and was developed using Anaconda, a pre-packaged Python distribution that contains all of the necessary libraries and software for data related projects, as well as using Jupyter Notebook for the report, and Visual Studio Code for development.
+
+## Resources
+
+For most of the python help, I took advantage of four sources:
+* https://stackoverflow.com
+* https://docs.python.org/
+* Multiple users and moderators of the official Python Discord channel. With specific debuging and optimization help (cutting off an insane 700 seconds of runtime) from users salt-die and Dan6erbond.
+* Alumni from this program and WGU, including Michael Kuehn and Pranav Suri and Sriram Jaju, via their personal githubs, and linked in messages 
+
+    * https://sriramjaju.github.io/2017-06-16-openstreetmap-data-wrangling-with-sql/
+    * https://github.com/pranavsuri/Data-Analyst-Nanodegree
+    * https://github.com/mkuehn10/P3-Wrangle-OpenStreetMap-Data
+
+For sql I didn't need much help, but often used https://www.w3schools.com/sql/default.asp for reminders.
