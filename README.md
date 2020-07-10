@@ -5,7 +5,7 @@ OpenStreetMap data of St Charles, MO is audited, cleaned and stored in an SQLite
 ## About
 In this project, wrangling and cleaning of a large dataset (>50MB) are performed. The data is then imported into SQLite for querying. The data was extracted from OpenStreetMap.
 
-## The objectives addressed are:
+## Objectives Addressed:
 For the area of study, download an XML-OSM raw dataset from OpenStreetMap.
 
 Audit and clean your dataset, converting it from XML to CSV format.
