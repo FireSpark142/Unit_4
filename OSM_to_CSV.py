@@ -165,7 +165,7 @@ import schema
 
 SCHEMA = schema.schema
 
-OSM_PATH = "stchas.osm"
+OSM_PATH = "sample1percent.osm"
 
 NODES_PATH = "nodes.csv"
 NODE_TAGS_PATH = "nodes_tags.csv"
@@ -210,59 +210,62 @@ mapping = {"St": "Street",
 def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIELDS,
                   problem_chars=PROBLEMCHARS, default_tag_type='regular'):
     """Clean and shape node or way XML element to Python dict"""
-
     node_attribs = {}
     way_attribs = {}
     way_nodes = []
     tags = []  # Handle secondary tags the same way for both node and way elements
 
-    # YOUR CODE HERE
-    if element.tag == 'node':
+    if element.tag == "node":
         for item in NODE_FIELDS:
-        # If the 'uid' field was empty "9999999" is set as 'uid'.
             try:
                 node_attribs[item] = element.attrib[item]
             except:
                 node_attribs[item] = "9999999"
-        #Iterating Through 'tag' elements
+    #Iterating Through 'tag' elements
         for tagz in element.iter('tag'):
-            if not problem_chars.search(tagz.attrib['k']):
+            tk = tagz.attrib['k']
+            tv = tagz.attrib['v']
+            if not problem_chars.search(tk):
                 tag_dict_node = {}
                 tag_dict_node['id'] = element.attrib['id']
-                tag_dict_node['value'] = tagz.attrib['v']
 
                 # Calling the street_update function to clean up problematic
-                # street names based on audit.py file.
+                # street names based on Audit.py file.
                 if is_street_name(tagz):
-                    better_name_node = update_street(tagz.attrib['v'])
+                    better_name_node = update_street(tv)
                     tag_dict_node['value'] = better_name_node
 
                 # Calling the update_postcode function to clean up problematic
-                # postcodes based on audit.py file.
+                # postcodes based on Audit.py file.
                 elif is_postcode(tagz):
-                    better_postcode_node = update_postcode(tagz.attrib['v'])
+                    better_postcode_node = update_postcode(tv)
                     tag_dict_node['value'] = better_postcode_node
 
                 # Calling the update_postcode function to clean up problematic
-                # postcodes based on audit.py file.
+                # postcodes based on Audit.py file.
                 elif is_city(tagz):
-                    better_city_node = update_city(tagz.attrib['v'])
+                    better_city_node = update_city(tv)
                     tag_dict_node['value'] = better_city_node
+                
+                else:
+                    tag_dict_node['value'] = tv
 
-                if ':' not in tagz.attrib['k']:
-                    tag_dict_node['key'] = tagz.attrib['k']
+                if ':' not in tk:
+                    tag_dict_node['key'] = tk
                     tag_dict_node['type'] = 'regular'
                 # Dividing words before and after a colon ':'
                 else:
-                    character_before_colon = re.findall('^[a-zA-Z]*:', tagz.attrib['k'])
-                    character_after_colon = re.findall(':[a-zA-Z_]+' , tagz.attrib['k'])
-                    if len(character_after_colon) != 0: #If the key was an empty field
-                        tag_dict_node['key'] = character_after_colon[0][1:]
-                    else:
-                        tag_dict_node['key'] = 'regular'
+                    tk_split = tk.split(":")
+                    if len(tk_split) == 2: #If the key was an empty field
+                        tag_dict_node['key'] = tk_split[1]
 
-                    if len(character_before_colon) != 0: #If the type was an empty field
-                        tag_dict_node['type'] = character_before_colon[0][: -1]
+                    elif len(tk_split) == 3:
+                        tag_dict_node['key'] = tk_split[1] + ":" + tk_split[2]
+                    else:
+                        tag_dict_node['key'] = tk
+
+                    if len(tk_split) >= 2: #If the key was an empty field
+                        tag_dict_node['type'] = tk_split[0]
                     else:
                         tag_dict_node['type'] = 'regular'
                 tags.append(tag_dict_node)
@@ -271,7 +274,6 @@ def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIE
 
     elif element.tag == 'way':
         for item in WAY_FIELDS:
-            # If the 'uid' field was empty "9999999" is set as 'uid'.
             try:
                 way_attribs[item] = element.attrib[item]
             except:
@@ -279,61 +281,62 @@ def shape_element(element, node_attr_fields=NODE_FIELDS, way_attr_fields=WAY_FIE
 
         # Iterating through 'tag' tags in way element.
         for tagz in element.iter('tag'):
-            if not problem_chars.search(tagz.attrib['k']):
+            wk = tagz.attrib['k']
+            wv = tagz.attrib['v']
+            if not problem_chars.search(wk):
                 tag_dict_way = {}
                 tag_dict_way['id'] = element.attrib['id']
-                tag_dict_way['value'] = tagz.attrib['v']
 
                 # Calling the street_update function to clean up problematic
                 # street names based on audit.py file.
                 if is_street_name(tagz):
-                    better_name_way = update_street(tagz.attrib['v'])
+                    better_name_way = update_street(wv)
                     tag_dict_way['value'] = better_name_way
 
                 # Calling the update_postcode function to clean up problematic
                 # postcodes based on audit.py file.
                 elif is_postcode(tagz):
-                    better_postcode_way = update_postcode(tagz.attrib['v'])
+                    better_postcode_way = update_postcode(wv)
                     tag_dict_way['value'] = better_postcode_way
 
                 # Calling the update_postcode function to clean up problematic
                 # postcodes based on audit.py file.
                 elif is_city(tagz):
-                    better_city_way = update_city(tagz.attrib['v'])
+                    better_city_way = update_city(wv)
                     tag_dict_way['value'] = better_city_way
 
                 # For other values that are not street names or postcodes.
                 else:
-                    tag_dict_way['value'] = tagz.attrib['v']
+                    tag_dict_way['value'] = wv
 
-                if ':' not in tagz.attrib['k']:
-                    tag_dict_way['key'] = tagz.attrib['k']
+                if ':' not in wk:
+                    tag_dict_way['key'] = wk
                     tag_dict_way['type'] = 'regular'
                 #Dividing words before and after a colon ':'
                 else:
-                    character_before_colon = re.findall('^[a-zA-Z]*:', tagz.attrib['k'])
-                    character_after_colon = re.findall(':[a-zA-Z_]+', tagz.attrib['k'])
+                    wk_split = wk.split(":")
 
-                    if len(character_after_colon) == 1:
-                        tag_dict_way['key'] = character_after_colon[0][1:]
-                    if len(character_after_colon) > 1:
-                        tag_dict_way['key'] = character_after_colon[0][1:] + character_after_colon[1]
+                    if len(wk_split) == 2: #If the key was an empty field
+                        tag_dict_way['key'] = wk_split[1]
 
-                    if len(character_before_colon) != 0: #If the type was an empty field
-                        tag_dict_way['type'] = character_before_colon[0][: -1]
+                    elif len(wk_split) == 3:
+                        tag_dict_way['key'] = wk_split[1] + ":" + wk_split[2]
+                    else:
+                        tag_dict_way['key'] = tk
+
+                    if len(wk_split) >= 2: #If the key was an empty field
+                        tag_dict_way['type'] = wk_split[0]
                     else:
                         tag_dict_way['type'] = 'regular'
 
                 tags.append(tag_dict_way)
 
-        # Iterating through 'nd' tags in way element.
-        count = 0
-        for tagz in element.iter('nd'):
+    # Iterating through 'nd' tags in way element.
+        for index, tagz in enumerate(element.iter('nd')):
             tag_dict_nd = {}
             tag_dict_nd['id'] = element.attrib['id']
             tag_dict_nd['node_id'] = tagz.attrib['ref']
-            tag_dict_nd['position'] = count
-            count += 1
+            tag_dict_nd['position'] = index
 
             way_nodes.append(tag_dict_nd)
 
@@ -422,4 +425,4 @@ def process_map(file_in, validate):
 if __name__ == '__main__':
     # Note: If the validation is set to True,
     # the process takes much longer than when it is set to False.
-    process_map(OSM_PATH, validate=False)
+    process_map(OSM_PATH, validate=True)

@@ -8,9 +8,9 @@ con = sqlite3.connect(db)
 con.text_factory = str
 cursor = con.cursor()
 
-# Here we drop the nodes_tags table if it exists to save us from data integrity issues when rerunning this file.
+# Here we drop all the tables we will soon make if they exist already to save us from data integrity issues when rerunning this file.
 cursor.execute('''
-    DROP TABLE IF EXISTS nodes_tags
+    DROP TABLE IF EXISTS nodes_tags, ways, ways_nodes, ways_tags, nodes
 ''')
 con.commit()
 
@@ -26,12 +26,6 @@ with open('nodes_tags.csv', 'rb') as f:
 
 # Lets go ahead and insert the data into the nodes_tags tables from the 'nodes_tags.csv' file.
 cursor.executemany('INSERT INTO nodes_tags(id, key, value, type) VALUES(?, ?, ?, ?);', iterate_db)
-con.commit()
-
-# Here we drop the ways table if it exists to save us from data integrity issues when rerunning this file
-cursor.execute('''
-    DROP TABLE IF EXISTS ways
-''')
 con.commit()
 
 # Now we need to create the ways tables.
@@ -50,12 +44,6 @@ with open('ways.csv', 'r') as f:
 cursor.executemany('INSERT INTO ways(id, user, uid, version, changeset, timestamp) VALUES(?, ?, ?, ?, ?, ?);', iterate_db)
 con.commit()
 
-# Here we drop the ways_nodes table if it exists to save us from data integrity issues when rerunning this file
-cursor.execute('''
-    DROP TABLE IF EXISTS ways_nodes
-''')
-con.commit()
-
 # Now on to creating the ways_nodes table
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS ways_nodes(id INTEGER, node_id INTEGER, position INTEGER)
@@ -68,12 +56,6 @@ with open('ways_nodes.csv', 'r') as f:
 
 # Insert the data found in the 'ways_nodes.csv' file into the newly created ways_nodes table.
 cursor.executemany('INSERT INTO ways_nodes(id, node_id, position) VALUES(?, ?, ?);', iterate_db)
-con.commit()
-
-# Here we drop the ways_tags table if it exists to save us from data integrity issues when rerunning this file
-cursor.execute('''
-    DROP TABLE IF EXISTS ways_tags
-''')
 con.commit()
 
 # We create the ways_tags table next.
@@ -90,12 +72,6 @@ with open('ways_tags.csv', 'r') as f:
 cursor.executemany('INSERT INTO ways_tags(id, key, value, type) VALUES(?, ?, ?, ?);', iterate_db)
 con.commit()
 
-# Here we drop the nodes table if it exists to save us from data integrity issues when rerunning this file
-cursor.execute('''
-    DROP TABLE IF EXISTS nodes
-''')
-con.commit()
-
 #Finally, we create the nodes table.
 cursor.execute('''
             CREATE TABLE IF NOT EXISTS nodes(id VARCHAR PRIMARY KEY, lat REAL,
@@ -110,5 +86,5 @@ with open('nodes.csv', 'r') as f:
 
 # Insert the data.
 cursor.executemany("INSERT INTO nodes(id, lat, lon, user, uid, version, changeset, timestamp) \
-                VALUES (?, ?, ?, ?,?, ?, ?, ?);", iterate_db)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?);", iterate_db)
 con.commit()
