@@ -29,9 +29,6 @@ def number_of_unique_users():
     return output.fetchone()[0]
 print('Number of unique users: %d' %(number_of_unique_users()))
 
-most_contributing_users()
-
-
 # Query for Top 10 Amenities in St Charles
 query = "SELECT value, COUNT(*) as num FROM nodes_tags \
             WHERE key='amenity' \

@@ -9,12 +9,35 @@ con.text_factory = str
 cursor = con.cursor()
 
 # Here we drop all the tables we will soon make if they exist already to save us from data integrity issues when rerunning this file.
+# Unfortunately, SQLite3 doesn't allow dropping of multiple tables in one line..
 cursor.execute('''
-    DROP TABLE IF EXISTS nodes_tags, ways, ways_nodes, ways_tags, nodes
+    DROP TABLE IF EXISTS nodes
 ''')
 con.commit()
 
-# Here we create nodes_tags table.
+cursor.execute('''
+    DROP TABLE IF EXISTS nodes_tags
+''')
+con.commit()
+
+cursor.execute('''
+    DROP TABLE IF EXISTS ways
+''')
+con.commit()
+
+
+cursor.execute('''
+    DROP TABLE IF EXISTS ways_tags
+''')
+con.commit()
+
+cursor.execute('''
+    DROP TABLE IF EXISTS ways_nodes
+''')
+con.commit()
+
+# Now we go head and create the nodes_tags table.
+
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS nodes_tags(id INTEGER, key TEXT, value TEXT, type TEXT)
 ''')
