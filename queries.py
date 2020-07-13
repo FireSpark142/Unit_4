@@ -45,33 +45,15 @@ def top_ten_amenities_in_st_charles():
 print('Top 10 Amenities:\n')
 top_ten_amenities_in_st_charles()
 
-# Different Types of Shops
+# Type of religions that each place_of_worship value returned
 query = "SELECT value, COUNT(*) as num FROM nodes_tags \
-            WHERE key='shop' \
-            GROUP BY value \
-            ORDER BY num DESC \
-            LIMIT 10"
+            WHERE key='religion' \
+            GROUP BY value"
 
-def shops_in_st_charles():
+def types_of_religion():
     output = cursor.execute(query)
     pprint(output.fetchall())
     return None
 
 print('Different types of shops:\n')
-shops_in_st_charles()
-
-# Popular Cafes in St Charles
-def most_popular_cafes():
-    output = cursor.execute('SELECT nodes_tags.value, COUNT(*) as num \
-                          FROM nodes_tags \
-                            JOIN (SELECT DISTINCT(id) FROM nodes_tags WHERE value="coffee_shop") AS cafes \
-                            ON nodes_tags.id = cafes.id \
-                            WHERE nodes_tags.key="name"\
-                            GROUP BY nodes_tags.value \
-                            ORDER BY num DESC \
-                            LIMIT 10' )
-    pprint(output.fetchall())
-    return output.fetchall()
-
-print('Most popular cafes in St Charles: \n')
-most_popular_cafes()
+types_of_religion()
