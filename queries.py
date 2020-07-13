@@ -29,58 +29,15 @@ def number_of_unique_users():
     return output.fetchone()[0]
 print('Number of unique users: %d' %(number_of_unique_users()))
 
-# Most Contributing Users
-def most_contributing_users():
-    output = cursor.execute('SELECT e.user, COUNT(*) as num FROM \
-                         (SELECT user FROM nodes UNION ALL SELECT user FROM ways) e \
-                         GROUP BY e.user \
-                         ORDER BY num DESC \
-                         LIMIT 10 ')
-    pprint(output.fetchall())
-    return None
-
 most_contributing_users()
 
-# Number of Users Who Contributed Once
-def number_of_users_contributed_once():
-    output = cursor.execute('SELECT COUNT(*) FROM \
-                             (SELECT e.user, COUNT(*) as num FROM \
-                                 (SELECT user FROM nodes UNION ALL SELECT user FROM ways) e \
-                                  GROUP BY e.user \
-                                  HAVING num = 1) u')
-    return output.fetchone()[0]
-print('Number of users who have contributed once: %d' % number_of_users_contributed_once())
-
-# Sort cities by count
-
-def cities_by_count():
-    output = cursor.execute("SELECT tags.value, COUNT(*) as count FROM \
-                                (SELECT * FROM nodes_tags UNION ALL SELECT * FROM ways_tags) tags \
-                                    WHERE tags.key LIKE 'city' \
-                                    GROUP BY tags.value \
-                                    ORDER BY count DESC;")
-    pprint(output.fetchall())
-    return None
-
-cities_by_count()
-
-def postcodes_by_count():
-    output = cursor.execute("SELECT tags.value, COUNT(*) as count FROM \
-                            (SELECT * FROM nodes_tags UNION ALL SELECT * FROM ways_tags) tags \
-                                WHERE tags.key='postcode' \
-                                GROUP BY tags.value \
-                                ORDER BY count DESC;")
-    pprint(output.fetchall())
-    return None
-
-postcodes_by_count()
 
 # Query for Top 10 Amenities in St Charles
 query = "SELECT value, COUNT(*) as num FROM nodes_tags \
             WHERE key='amenity' \
             GROUP BY value \
             ORDER BY num DESC \
-            LIMIT 20"
+            LIMIT 10"
 
 # Top 10 Amenities in St Charles
 def top_ten_amenities_in_st_charles():
@@ -90,21 +47,6 @@ def top_ten_amenities_in_st_charles():
 
 print('Top 10 Amenities:\n')
 top_ten_amenities_in_st_charles()
-
-# Top 10 Cuisines in St Charles
-query = "SELECT value, COUNT(*) as num FROM ways_tags \
-            WHERE key='cuisine' \
-            GROUP BY value \
-            ORDER BY num DESC \
-            LIMIT 10"
-
-def cuisines_in_st_charles():
-    output = cursor.execute(query)
-    pprint(output.fetchall())
-    return None
-
-print('Top 10 Cuisines in St Charles:\n')
-cuisines_in_st_charles()
 
 # Different Types of Shops
 query = "SELECT value, COUNT(*) as num FROM nodes_tags \
@@ -130,7 +72,7 @@ def most_popular_cafes():
                             WHERE nodes_tags.key="name"\
                             GROUP BY nodes_tags.value \
                             ORDER BY num DESC \
-                            LIMIT 10' ) # Remove this limit to see the complete list of postcodes
+                            LIMIT 10' )
     pprint(output.fetchall())
     return output.fetchall()
 
